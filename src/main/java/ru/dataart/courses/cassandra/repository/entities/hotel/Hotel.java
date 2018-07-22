@@ -1,4 +1,4 @@
-package ru.dataart.courses.cassandra.entities.hotel;
+package ru.dataart.courses.cassandra.repository.entities.hotel;
 
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;

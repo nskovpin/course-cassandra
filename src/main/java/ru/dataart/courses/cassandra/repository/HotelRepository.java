@@ -3,8 +3,8 @@ package ru.dataart.courses.cassandra.repository;
 import org.springframework.data.cassandra.repository.CassandraRepository;
 import org.springframework.data.cassandra.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ru.dataart.courses.cassandra.entities.hotel.Hotel;
-import ru.dataart.courses.cassandra.entities.hotel.HotelKey;
+import ru.dataart.courses.cassandra.repository.entities.hotel.Hotel;
+import ru.dataart.courses.cassandra.repository.entities.hotel.HotelKey;
 
 public interface HotelRepository  extends CassandraRepository<Hotel, HotelKey> {
 

@@ -1,4 +1,4 @@
-package ru.dataart.courses.cassandra.entities.guest;
+package ru.dataart.courses.cassandra.repository.entities.guest;
 
 
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;

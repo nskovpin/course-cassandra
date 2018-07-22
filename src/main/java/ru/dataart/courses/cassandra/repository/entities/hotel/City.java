@@ -1,7 +1,5 @@
-package ru.dataart.courses.cassandra.entities.hotel;
+package ru.dataart.courses.cassandra.repository.entities.hotel;
 
-import org.springframework.data.cassandra.core.cql.Ordering;
-import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
 
 @Table(value = "city")

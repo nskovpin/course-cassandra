@@ -4,11 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.dataart.courses.cassandra.entities.booking.BookingDetail;
-import ru.dataart.courses.cassandra.entities.guest.Guest;
-import ru.dataart.courses.cassandra.entities.hotel.City;
-import ru.dataart.courses.cassandra.entities.hotel.Hotel;
-import ru.dataart.courses.cassandra.entities.hotel.Room;
+import ru.dataart.courses.cassandra.repository.entities.booking.BookingDetail;
+import ru.dataart.courses.cassandra.repository.entities.guest.Guest;
+import ru.dataart.courses.cassandra.repository.entities.hotel.City;
+import ru.dataart.courses.cassandra.repository.entities.hotel.Hotel;
+import ru.dataart.courses.cassandra.repository.entities.hotel.Room;
 import ru.dataart.courses.cassandra.repository.*;
 
 import java.sql.Date;

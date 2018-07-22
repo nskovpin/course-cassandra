@@ -1,4 +1,4 @@
-package ru.dataart.courses.cassandra.entities.booking;
+package ru.dataart.courses.cassandra.repository.entities.booking;
 
 public enum BeginEnd {
     B("BEGIN"), E("END");

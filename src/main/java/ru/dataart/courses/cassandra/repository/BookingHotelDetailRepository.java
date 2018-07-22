@@ -3,12 +3,11 @@ package ru.dataart.courses.cassandra.repository;
 import org.springframework.data.cassandra.repository.CassandraRepository;
 import org.springframework.data.cassandra.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ru.dataart.courses.cassandra.entities.booking.BookingDetail;
-import ru.dataart.courses.cassandra.entities.booking.BookingHotelDetail;
-import ru.dataart.courses.cassandra.entities.booking.BookingHotelDetailKey;
+import ru.dataart.courses.cassandra.repository.entities.booking.BookingDetail;
+import ru.dataart.courses.cassandra.repository.entities.booking.BookingHotelDetail;
+import ru.dataart.courses.cassandra.repository.entities.booking.BookingHotelDetailKey;
 
 import java.sql.Timestamp;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 public interface BookingHotelDetailRepository extends CassandraRepository<BookingHotelDetail, BookingHotelDetailKey> {

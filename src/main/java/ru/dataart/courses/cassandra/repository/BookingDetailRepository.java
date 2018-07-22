@@ -4,8 +4,8 @@ import org.springframework.data.cassandra.repository.CassandraRepository;
 import org.springframework.data.cassandra.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.dataart.courses.cassandra.entities.booking.BookingDetail;
-import ru.dataart.courses.cassandra.entities.booking.BookingDetailKey;
+import ru.dataart.courses.cassandra.repository.entities.booking.BookingDetail;
+import ru.dataart.courses.cassandra.repository.entities.booking.BookingDetailKey;
 
 import java.sql.Date;
 import java.util.UUID;

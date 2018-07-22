@@ -1,4 +1,4 @@
-package ru.dataart.courses.cassandra.entities.booking;
+package ru.dataart.courses.cassandra.repository.entities.booking;
 
 
 import org.springframework.data.cassandra.core.mapping.Column;

@@ -1,7 +1,5 @@
 package ru.dataart.courses.cassandra;
 
-import com.datastax.driver.core.ColumnDefinitions;
-import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 import org.junit.Assert;
 import org.junit.Test;
@@ -11,17 +9,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.dataart.courses.cassandra.config.ApplicationConfig;
-import ru.dataart.courses.cassandra.entities.booking.BookingDetail;
-import ru.dataart.courses.cassandra.entities.guest.Guest;
-import ru.dataart.courses.cassandra.entities.hotel.Room;
+import ru.dataart.courses.cassandra.repository.entities.booking.BookingDetail;
 import ru.dataart.courses.cassandra.repository.BookingDetailRepository;
 import ru.dataart.courses.cassandra.repository.SaveRepository;
 
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
