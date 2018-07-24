@@ -10,6 +10,10 @@ public class Guest {
     @PrimaryKey
     private GuestKey guestKey;
 
+    public Guest() {
+        this.guestKey = new GuestKey();
+    }
+
     public GuestKey getGuestKey() {
         return guestKey;
     }

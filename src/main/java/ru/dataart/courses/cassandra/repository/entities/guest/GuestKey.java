@@ -18,6 +18,10 @@ public class GuestKey implements Serializable{
     @PrimaryKeyColumn(name = "id", type = PrimaryKeyType.CLUSTERED, ordinal = 1)
     private UUID id;
 
+    public GuestKey() {
+        this.id = UUID.randomUUID();
+    }
+
     public String getGuestName() {
         return guestName;
     }

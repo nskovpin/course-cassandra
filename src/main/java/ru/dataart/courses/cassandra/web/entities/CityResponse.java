@@ -1,4 +1,4 @@
-package ru.dataart.courses.cassandra.web.response;
+package ru.dataart.courses.cassandra.web.entities;
 
 public class CityResponse {
 

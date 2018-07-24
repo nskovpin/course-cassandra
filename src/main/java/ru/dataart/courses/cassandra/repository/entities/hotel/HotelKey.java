@@ -17,7 +17,6 @@ public class HotelKey implements Serializable {
     @PrimaryKeyColumn(name = "city_name", type = PrimaryKeyType.CLUSTERED, ordinal = 1)
     private String cityName;
 
-
     public String getHotelName() {
         return hotelName;
     }

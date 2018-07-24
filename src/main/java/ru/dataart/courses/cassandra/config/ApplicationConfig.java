@@ -5,6 +5,7 @@ import com.datastax.driver.core.Session;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.cassandra.config.AbstractCassandraConfiguration;
 import org.springframework.data.cassandra.config.CassandraEntityClassScanner;
 import org.springframework.data.cassandra.config.CassandraSessionFactoryBean;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @Configuration
 @EnableWebMvc
 @EnableCassandraRepositories("ru.dataart.courses.cassandra.repository")
+@Import(AspectConfig.class)
 public class ApplicationConfig extends AbstractCassandraConfiguration {
 
     @Value("${cassandra.address}")
