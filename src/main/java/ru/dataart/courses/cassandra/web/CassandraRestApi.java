@@ -7,15 +7,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.dataart.courses.cassandra.config.SelfChecked;
+import ru.dataart.courses.cassandra.repository.entities.booking.Booking;
 import ru.dataart.courses.cassandra.repository.entities.guest.Guest;
 import ru.dataart.courses.cassandra.repository.entities.hotel.Hotel;
+import ru.dataart.courses.cassandra.repository.entities.hotel.Room;
 import ru.dataart.courses.cassandra.service.BookingService;
-import ru.dataart.courses.cassandra.web.entities.BookedResponse;
-import ru.dataart.courses.cassandra.web.entities.CityResponse;
-import ru.dataart.courses.cassandra.web.entities.GuestRequest;
-import ru.dataart.courses.cassandra.web.entities.HotelRequest;
+import ru.dataart.courses.cassandra.web.entities.*;
 
 import javax.validation.constraints.NotNull;
+import java.io.ObjectStreamClass;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -60,10 +60,41 @@ public class CassandraRestApi {
         return new ResponseEntity<>(hotelDb, HttpStatus.CREATED);
     }
 
+    @RequestMapping(path = "/add/hotel", method = RequestMethod.POST)
+    public ResponseEntity<Room> addNewRoom(@RequestBody @NotNull RoomRequest room) {
+        Objects.requireNonNull(room);
+        Room roomDb = new Room();
+        roomDb.getRoomKey().setCity(room.getCity());
+        roomDb.getRoomKey().setHotel(room.getHotel());
+        roomDb.getRoomKey().setRoomNumber(room.getRoomNumber());
+        bookingService.saveRoom(roomDb);
+        return new ResponseEntity<>(roomDb, HttpStatus.CREATED);
+    }
+
     @RequestMapping(path = "/add/guest", method = RequestMethod.POST)
     public ResponseEntity<?> addNewGuest(@RequestBody @NotNull GuestRequest guest) {
+        Objects.requireNonNull(guest);
         Guest guestDb = new Guest();
         guestDb.getGuestKey().setGuestName(guest.getName());
+        bookingService.saveGuest(guestDb);
+        return new ResponseEntity(HttpStatus.CREATED);
+    }
+
+    @RequestMapping(path = "/add/booking", method = RequestMethod.POST)
+    public ResponseEntity<?> addNewGuest(@RequestBody @NotNull BookingRequest bookingRequest) {
+        Objects.requireNonNull(bookingRequest);
+        Guest guestDb = bookingService.findGuestByName(bookingRequest.getGuestName());
+        if(Objects.isNull(guestDb)){
+            guestDb = new Guest();
+            guestDb.getGuestKey().setGuestName(bookingRequest.getGuestName());
+            bookingService.saveGuest(guestDb);
+        }
+        Booking bookingDb = new Booking();
+        bookingDb.setGuestId(guestDb.getGuestKey().getId());
+        bookingDb.setComment(bookingRequest.getComment());
+        bookingService.saveBooking(bookingDb);
+
+
         bookingService.saveGuest(guestDb);
         return new ResponseEntity(HttpStatus.CREATED);
     }

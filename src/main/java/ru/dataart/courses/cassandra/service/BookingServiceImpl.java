@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.dataart.courses.cassandra.repository.entities.booking.Booking;
 import ru.dataart.courses.cassandra.repository.entities.booking.BookingDetail;
 import ru.dataart.courses.cassandra.repository.entities.guest.Guest;
 import ru.dataart.courses.cassandra.repository.entities.hotel.City;
@@ -27,11 +28,13 @@ public class BookingServiceImpl implements BookingService {
     private SaveRepository saveRepository;
     private HotelRepository hotelRepository;
     private CityRepository cityRepository;
+    private GuestRepository guestRepository;
 
     public BookingServiceImpl(@Autowired BookingDetailRepository bookingDetailRepository,
                               @Autowired BookingHotelDetailRepository bookingHotelDetailRepository,
                               @Autowired SaveRepository saveRepository,
-                              @Autowired HotelRepository hotelRepository) {
+                              @Autowired HotelRepository hotelRepository,
+                              @Autowired GuestRepository guestRepository) {
         this.bookingDetailRepository = bookingDetailRepository;
         this.bookingHotelDetailRepository = bookingHotelDetailRepository;
         this.saveRepository = saveRepository;
@@ -90,6 +93,19 @@ public class BookingServiceImpl implements BookingService {
         return true;
     }
 
+    @Override
+    public boolean saveBooking(Booking booking) {
+        try {
+            saveRepository.saveBooking(booking);
+            logger.info("{} has been successfully saved", booking.getBookingKey());
+        } catch (Exception e) {
+            logger.error("{} hasn't been saved", booking.getBookingKey());
+            logger.error(e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
 
     @Override
     public List<Integer> getFreeRooms(String hotelName, String city, LocalDateTime startReserveTime, LocalDateTime endReserveTime) {
@@ -114,6 +130,10 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<City> findAllByCityName(String cityName) {
         return cityRepository.findAllByCityName(cityName);
+    }
+
+    public Guest findGuestByName(String name){
+        return guestRepository.findOneByGuestName(name);
     }
 
 }
