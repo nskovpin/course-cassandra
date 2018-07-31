@@ -40,12 +40,11 @@ public class CassandraRestApi {
 
     @RequestMapping(path = "/get/city", method = RequestMethod.GET)
     @SelfChecked
-    public List<ResponseEntity<CityResponse>> getAllCities(@RequestParam("name") @NotNull String name) {
-        return bookingService.findAllByCityName(name)
+    public ResponseEntity<List<CityResponse>> getHotelsByCity(@RequestParam("name") @NotNull String name) {
+        return new ResponseEntity<>(bookingService.findAllByCityName(name)
                 .stream()
                 .map(x -> new CityResponse(x.getCityKey().getCityName(), x.getCityKey().getHotelName()))
-                .map(x -> new ResponseEntity<>(x, HttpStatus.FOUND))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()),HttpStatus.FOUND);
     }
 
     @RequestMapping(path = "/add/hotel", method = RequestMethod.POST)
@@ -72,12 +71,12 @@ public class CassandraRestApi {
     }
 
     @RequestMapping(path = "/add/guest", method = RequestMethod.POST)
-    public ResponseEntity<?> addNewGuest(@RequestBody @NotNull GuestRequest guest) {
+    public ResponseEntity<Guest> addNewGuest(@RequestBody @NotNull GuestRequest guest) {
         Objects.requireNonNull(guest);
         Guest guestDb = new Guest();
         guestDb.getGuestKey().setGuestName(guest.getName());
         bookingService.saveGuest(guestDb);
-        return new ResponseEntity(HttpStatus.CREATED);
+        return new ResponseEntity<>(guestDb, HttpStatus.CREATED);
     }
 
     @RequestMapping(path = "/add/booking", method = RequestMethod.POST)
@@ -109,14 +108,13 @@ public class CassandraRestApi {
     }
 
     @RequestMapping(path = "/get/roombyguest", method = RequestMethod.GET)
-    public List<ResponseEntity<BookedResponse>> getShit(@RequestParam String userId,
+    public ResponseEntity<List<BookedResponse>> getShit(@RequestParam String userId,
                                                         @RequestParam LocalDateTime date){
         UUID id = UUID.fromString(userId);
-        return bookingService.getReservedRooms(id, date)
+        return new ResponseEntity<>(bookingService.getReservedRooms(id, date)
                 .stream()
                 .map(x -> new BookedResponse())
-                .map(x -> new ResponseEntity<BookedResponse>(x, HttpStatus.FOUND))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()), HttpStatus.FOUND);
     }
 
 }
