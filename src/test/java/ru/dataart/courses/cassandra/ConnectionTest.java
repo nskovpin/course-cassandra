@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.dataart.courses.cassandra.config.ApplicationConfig;
 import ru.dataart.courses.cassandra.repository.entities.booking.BookingDetail;
@@ -24,6 +25,7 @@ import java.util.stream.Stream;
 @SpringBootTest
 @RunWith(SpringRunner.class)
 @Import(ApplicationConfig.class)
+@Profile("integration")
 public class ConnectionTest {
 
     @Autowired

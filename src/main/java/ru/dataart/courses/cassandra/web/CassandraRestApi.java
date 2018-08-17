@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.dataart.courses.cassandra.config.SelfChecked;
+import ru.dataart.courses.cassandra.config.ApiChecked;
 import ru.dataart.courses.cassandra.repository.entities.booking.Booking;
 import ru.dataart.courses.cassandra.repository.entities.guest.Guest;
 import ru.dataart.courses.cassandra.repository.entities.hotel.Hotel;
@@ -15,7 +15,6 @@ import ru.dataart.courses.cassandra.service.BookingService;
 import ru.dataart.courses.cassandra.web.entities.*;
 
 import javax.validation.constraints.NotNull;
-import java.io.ObjectStreamClass;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -39,15 +38,16 @@ public class CassandraRestApi {
     }
 
     @RequestMapping(path = "/get/city", method = RequestMethod.GET)
-    @SelfChecked
+    @ApiChecked
     public ResponseEntity<List<CityResponse>> getHotelsByCity(@RequestParam("name") @NotNull String name) {
         return new ResponseEntity<>(bookingService.findAllByCityName(name)
                 .stream()
                 .map(x -> new CityResponse(x.getCityKey().getCityName(), x.getCityKey().getHotelName()))
-                .collect(Collectors.toList()),HttpStatus.FOUND);
+                .collect(Collectors.toList()), HttpStatus.FOUND);
     }
 
     @RequestMapping(path = "/add/hotel", method = RequestMethod.POST)
+    @ApiChecked
     public ResponseEntity<Hotel> addNewHotel(@RequestBody @NotNull HotelRequest hotel) {
         Objects.requireNonNull(hotel);
         Hotel hotelDb = new Hotel();
@@ -59,7 +59,8 @@ public class CassandraRestApi {
         return new ResponseEntity<>(hotelDb, HttpStatus.CREATED);
     }
 
-    @RequestMapping(path = "/add/hotel", method = RequestMethod.POST)
+    @RequestMapping(path = "/add/room", method = RequestMethod.POST)
+    @ApiChecked
     public ResponseEntity<Room> addNewRoom(@RequestBody @NotNull RoomRequest room) {
         Objects.requireNonNull(room);
         Room roomDb = new Room();
@@ -108,7 +109,7 @@ public class CassandraRestApi {
     }
 
     @RequestMapping(path = "/get/roombyguest", method = RequestMethod.GET)
-    public ResponseEntity<List<BookedResponse>> getShit(@RequestParam String userId,
+    public ResponseEntity<List<BookedResponse>> getRoomByGuest(@RequestParam String userId,
                                                         @RequestParam LocalDateTime date){
         UUID id = UUID.fromString(userId);
         return new ResponseEntity<>(bookingService.getReservedRooms(id, date)

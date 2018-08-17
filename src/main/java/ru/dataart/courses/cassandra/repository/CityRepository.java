@@ -8,7 +8,7 @@ import ru.dataart.courses.cassandra.repository.entities.hotel.CityKey;
 
 import java.util.List;
 
-@Repository
+@RepositoryProfile
 public interface CityRepository extends CassandraRepository<City, CityKey> {
 
     //Explanation: Get all hotels of a current city

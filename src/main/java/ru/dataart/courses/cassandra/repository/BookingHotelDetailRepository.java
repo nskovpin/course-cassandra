@@ -3,6 +3,7 @@ package ru.dataart.courses.cassandra.repository;
 import org.springframework.data.cassandra.repository.CassandraRepository;
 import org.springframework.data.cassandra.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import ru.dataart.courses.cassandra.repository.entities.booking.BookingDetail;
 import ru.dataart.courses.cassandra.repository.entities.booking.BookingHotelDetail;
 import ru.dataart.courses.cassandra.repository.entities.booking.BookingHotelDetailKey;
@@ -10,6 +11,7 @@ import ru.dataart.courses.cassandra.repository.entities.booking.BookingHotelDeta
 import java.sql.Timestamp;
 import java.util.stream.Stream;
 
+@RepositoryProfile
 public interface BookingHotelDetailRepository extends CassandraRepository<BookingHotelDetail, BookingHotelDetailKey> {
 
     //Explanation: Gets free rooms in a specific hotel for the current period.

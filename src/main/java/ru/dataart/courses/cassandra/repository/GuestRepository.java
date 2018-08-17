@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import ru.dataart.courses.cassandra.repository.entities.guest.Guest;
 import ru.dataart.courses.cassandra.repository.entities.guest.GuestKey;
 
-@Repository
+@RepositoryProfile
 public interface GuestRepository extends CassandraRepository<Guest, GuestKey> {
 
     @Query("select * from guest where guest_name=?0")

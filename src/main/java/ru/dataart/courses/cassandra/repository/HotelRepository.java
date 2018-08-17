@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import ru.dataart.courses.cassandra.repository.entities.hotel.Hotel;
 import ru.dataart.courses.cassandra.repository.entities.hotel.HotelKey;
 
+@RepositoryProfile
 public interface HotelRepository  extends CassandraRepository<Hotel, HotelKey> {
 
     @Query("select * from hotel where hotel_name = :hotel and city_name = :city")

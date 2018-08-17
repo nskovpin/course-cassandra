@@ -4,6 +4,7 @@ import com.datastax.driver.core.querybuilder.QueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.cassandra.core.CassandraOperations;
 import org.springframework.stereotype.Repository;
 import ru.dataart.courses.cassandra.repository.entities.booking.Booking;
@@ -17,7 +18,7 @@ import ru.dataart.courses.cassandra.repository.entities.hotel.Room;
 import java.util.Objects;
 import java.util.UUID;
 
-@Repository
+@RepositoryProfile
 public class SaveRepository {
     public static final Logger log = LoggerFactory.getLogger(SaveRepository.class);
 

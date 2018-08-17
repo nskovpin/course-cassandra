@@ -12,10 +12,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class BookingExceptionHandler extends ResponseEntityExceptionHandler {
 
 
-    @ExceptionHandler
-    public ResponseEntity<?> hadleCustomError(){
-        return new ResponseEntity<Object>("", HttpStatus.BAD_REQUEST);
-    }
+//    @ExceptionHandler
+//    public ResponseEntity<?> handleCustomError(){
+//        return new ResponseEntity<Object>("", HttpStatus.BAD_REQUEST);
+//    }
 
 
 }

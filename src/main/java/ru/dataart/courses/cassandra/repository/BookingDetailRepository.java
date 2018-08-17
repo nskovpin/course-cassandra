@@ -11,7 +11,7 @@ import java.sql.Date;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-@Repository
+@RepositoryProfile
 public interface BookingDetailRepository extends CassandraRepository<BookingDetail, BookingDetailKey> {
 
     //Explanation: Guest has booked some room / rooms. Gets booked room / rooms by the specific date and guest number.
