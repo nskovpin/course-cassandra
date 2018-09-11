@@ -4,18 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,13 +20,11 @@ import ru.dataart.courses.cassandra.repository.entities.hotel.City;
 import ru.dataart.courses.cassandra.repository.entities.hotel.Hotel;
 import ru.dataart.courses.cassandra.repository.entities.hotel.Room;
 import ru.dataart.courses.cassandra.service.BookingService;
-import ru.dataart.courses.cassandra.web.CassandraRestApi;
+import ru.dataart.courses.cassandra.web.entities.BookingRequest;
 import ru.dataart.courses.cassandra.web.entities.GuestRequest;
 import ru.dataart.courses.cassandra.web.entities.HotelRequest;
 import ru.dataart.courses.cassandra.web.entities.RoomRequest;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -60,7 +53,7 @@ public class BookingWebTest {
     private ObjectMapper mapper;
 
     @Before
-    public void setup(){
+    public void setup() {
         List<City> cities = new ArrayList<>();
         City city = new City();
         city.getCityKey().setCityName("Moscow");
@@ -98,7 +91,7 @@ public class BookingWebTest {
         hotelRequest.setCity("Voronezh");
         hotelRequest.setAddress("Bolshaya");
         hotelRequest.setHotel("BRNO");
-        hotelRequest.setRooms(new HashSet<>(Arrays.asList(1,2,3)));
+        hotelRequest.setRooms(new HashSet<>(Arrays.asList(1, 2, 3)));
 
         mvc.perform(post("/api/add/hotel")
                 .content(mapper.writeValueAsString(hotelRequest))
@@ -135,5 +128,19 @@ public class BookingWebTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("guestKey.guestName", is("Nikolay")));
     }
+
+    @Test
+    public void addBookingTest() throws Exception {
+        BookingRequest bookingRequest = new BookingRequest();
+        bookingRequest.setComment("This is comment");
+        bookingRequest.setGuestName("Nikolay");
+
+        mvc.perform(post("/api/add/guest")
+                .content(mapper.writeValueAsString(null))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("guestKey.guestName", is("Nikolay")));
+    }
+
 
 }

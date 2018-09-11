@@ -106,6 +106,19 @@ public class BookingServiceImpl implements BookingService {
         return true;
     }
 
+    @Override
+    public boolean saveBookingDetails(BookingDetail bookingDetail, SaveRepository.BeginEnd beginEnd) {
+        try {
+            saveRepository.saveBookingDetail(bookingDetail, beginEnd);
+            logger.info("{} has been successfully saved", bookingDetail.getBookingDetailKey());
+        } catch (Exception e) {
+            logger.error("{} hasn't been saved", bookingDetail.getBookingDetailKey());
+            logger.error(e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
 
     @Override
     public List<Integer> getFreeRooms(String hotelName, String city, LocalDateTime startReserveTime, LocalDateTime endReserveTime) {

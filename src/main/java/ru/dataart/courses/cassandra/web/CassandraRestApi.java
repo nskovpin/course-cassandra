@@ -72,6 +72,7 @@ public class CassandraRestApi {
     }
 
     @RequestMapping(path = "/add/guest", method = RequestMethod.POST)
+    @ApiChecked
     public ResponseEntity<Guest> addNewGuest(@RequestBody @NotNull GuestRequest guest) {
         Objects.requireNonNull(guest);
         Guest guestDb = new Guest();
@@ -93,6 +94,9 @@ public class CassandraRestApi {
         bookingDb.setGuestId(guestDb.getGuestKey().getId());
         bookingDb.setComment(bookingRequest.getComment());
         bookingService.saveBooking(bookingDb);
+
+        //loop
+        //TODO
 
 
         bookingService.saveGuest(guestDb);

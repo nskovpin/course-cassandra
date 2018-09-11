@@ -1,5 +1,6 @@
 package ru.dataart.courses.cassandra.service;
 
+import ru.dataart.courses.cassandra.repository.SaveRepository;
 import ru.dataart.courses.cassandra.repository.entities.booking.Booking;
 import ru.dataart.courses.cassandra.repository.entities.booking.BookingDetail;
 import ru.dataart.courses.cassandra.repository.entities.guest.Guest;
@@ -22,6 +23,8 @@ public interface BookingService {
     boolean saveGuest(Guest guest);
 
     boolean saveBooking(Booking booking);
+
+    boolean saveBookingDetails(BookingDetail bookingDetail, SaveRepository.BeginEnd beginEnd);
 
     List<Integer> getFreeRooms(String hotelName, String city, LocalDateTime startReserveTime, LocalDateTime endReserveTime);
 
