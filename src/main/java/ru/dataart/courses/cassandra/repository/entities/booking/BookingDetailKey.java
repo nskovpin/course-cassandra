@@ -35,6 +35,14 @@ public class BookingDetailKey implements Serializable {
         this.day = day;
     }
 
+    public BookingDetailKey() {
+    }
+
+    public BookingDetailKey(Date day, UUID guestId) {
+        this.guestId = guestId;
+        this.day = day;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

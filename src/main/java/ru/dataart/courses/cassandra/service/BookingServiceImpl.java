@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.dataart.courses.cassandra.repository.entities.booking.Booking;
 import ru.dataart.courses.cassandra.repository.entities.booking.BookingDetail;
+import ru.dataart.courses.cassandra.repository.entities.booking.BookingHotelDetail;
 import ru.dataart.courses.cassandra.repository.entities.guest.Guest;
 import ru.dataart.courses.cassandra.repository.entities.hotel.City;
 import ru.dataart.courses.cassandra.repository.entities.hotel.Hotel;
@@ -107,12 +108,25 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public boolean saveBookingDetails(BookingDetail bookingDetail, SaveRepository.BeginEnd beginEnd) {
+    public boolean saveBookingDetails(BookingDetail bookingDetail) {
         try {
-            saveRepository.saveBookingDetail(bookingDetail, beginEnd);
+            saveRepository.saveBookingDetail(bookingDetail);
             logger.info("{} has been successfully saved", bookingDetail.getBookingDetailKey());
         } catch (Exception e) {
             logger.error("{} hasn't been saved", bookingDetail.getBookingDetailKey());
+            logger.error(e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean saveBookingHotelDetails(BookingHotelDetail bookingHotelDetail) {
+        try {
+            saveRepository.saveBookingHotelDetail(bookingHotelDetail);
+            logger.info("{} has been successfully saved", bookingHotelDetail.getBookingHotelDetailKey());
+        } catch (Exception e) {
+            logger.error("{} hasn't been saved", bookingHotelDetail.getBookingHotelDetailKey());
             logger.error(e.getMessage());
             return false;
         }

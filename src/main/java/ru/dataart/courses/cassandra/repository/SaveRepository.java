@@ -67,25 +67,11 @@ public class SaveRepository {
         cassandraOperations.insert(booking);
     }
 
-    public void saveBookingDetail(BookingDetail bookingDetail, BeginEnd beginEnd){
+    public void saveBookingDetail(BookingDetail bookingDetail){
         cassandraOperations.insert(bookingDetail);
-        UUID bookingId = bookingDetail.getBookingId();
-        BookingHotelDetail bookingHotelDetail = new BookingHotelDetail();
-        bookingHotelDetail.getBookingHotelDetailKey().setHotel(bookingDetail.getHotel());
-        bookingHotelDetail.getBookingHotelDetailKey().setCity(bookingDetail.getCity());
-        bookingHotelDetail.getBookingHotelDetailKey().setBeginEnd(beginEnd.getName());
-        switch (beginEnd){
-            case BEGIN:{
-                bookingHotelDetail.getBookingHotelDetailKey().setEventDate(bookingDetail.getStart());
-                break;
-            }
-            case END:{
-                bookingHotelDetail.getBookingHotelDetailKey().setEventDate(bookingDetail.getEnd());
-                break;
-            }
-        }
-        bookingHotelDetail.getBookingHotelDetailKey().setRoomNumber(bookingDetail.getRoomNumber());
-        bookingHotelDetail.setBookingId(bookingId);
+    }
+
+    public void saveBookingHotelDetail(BookingHotelDetail bookingHotelDetail){
         cassandraOperations.insert(bookingHotelDetail);
     }
 

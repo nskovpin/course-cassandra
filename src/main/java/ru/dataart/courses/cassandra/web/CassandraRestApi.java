@@ -7,7 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.dataart.courses.cassandra.config.ApiChecked;
+import ru.dataart.courses.cassandra.repository.SaveRepository;
 import ru.dataart.courses.cassandra.repository.entities.booking.Booking;
+import ru.dataart.courses.cassandra.repository.entities.booking.BookingDetail;
+import ru.dataart.courses.cassandra.repository.entities.booking.BookingDetailKey;
+import ru.dataart.courses.cassandra.repository.entities.booking.BookingHotelDetail;
 import ru.dataart.courses.cassandra.repository.entities.guest.Guest;
 import ru.dataart.courses.cassandra.repository.entities.hotel.Hotel;
 import ru.dataart.courses.cassandra.repository.entities.hotel.Room;
@@ -15,11 +19,16 @@ import ru.dataart.courses.cassandra.service.BookingService;
 import ru.dataart.courses.cassandra.web.entities.*;
 
 import javax.validation.constraints.NotNull;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static ru.dataart.courses.cassandra.repository.SaveRepository.BeginEnd.BEGIN;
 
 @RestController
 @RequestMapping(path = "/api")
@@ -94,13 +103,19 @@ public class CassandraRestApi {
         bookingDb.setGuestId(guestDb.getGuestKey().getId());
         bookingDb.setComment(bookingRequest.getComment());
         bookingService.saveBooking(bookingDb);
-
         //loop
         //TODO
+        List<BookingDetail> bookingsByDays = splitByDays(bookingRequest, guestDb.getGuestKey().getId(), bookingDb.getBookingKey().getId());
+        bookingsByDays.forEach(x -> bookingService.saveBookingDetails(x));
+
+        BookingHotelDetail startEntity = createBookingHotelDetails(bookingRequest, bookingDb.getBookingKey().getId(), SaveRepository.BeginEnd.BEGIN);
+        BookingHotelDetail endEntity = createBookingHotelDetails(bookingRequest, bookingDb.getBookingKey().getId(), SaveRepository.BeginEnd.END);
+        bookingService.saveBookingHotelDetails(startEntity);
+        bookingService.saveBookingHotelDetails(endEntity);
 
 
         bookingService.saveGuest(guestDb);
-        return new ResponseEntity(HttpStatus.CREATED);
+        return new ResponseEntity<>(bookingDb, HttpStatus.CREATED);
     }
 
     @RequestMapping(path = "/get/freerooms", method = RequestMethod.GET)
@@ -120,6 +135,46 @@ public class CassandraRestApi {
                 .stream()
                 .map(x -> new BookedResponse())
                 .collect(Collectors.toList()), HttpStatus.FOUND);
+    }
+
+    private List<BookingDetail> splitByDays(BookingRequest bookingRequest, UUID guestId, UUID bookingId){
+        LocalDateTime start = bookingRequest.getStart().toLocalDateTime();
+        LocalDateTime end = bookingRequest.getEnd().toLocalDateTime();
+        List<BookingDetail> days = new ArrayList<>();
+        while (start.isBefore(end)){
+            LocalDateTime day = start.plusDays(1);
+            BookingDetail bookingDetail = new BookingDetail();
+            bookingDetail.setBookingDetailKey(new BookingDetailKey(Date.valueOf(day.toLocalDate()), guestId));
+            bookingDetail.setBookingId(bookingId);
+            bookingDetail.setCity(bookingRequest.getCity());
+            bookingDetail.setStart(bookingRequest.getStart());
+            bookingDetail.setEnd(bookingRequest.getEnd());
+            bookingDetail.setHotel(bookingRequest.getHotel());
+            bookingDetail.setRoomNumber(bookingRequest.getRoomNumber());
+            days.add(bookingDetail);
+            start = day;
+        }
+        return days;
+    }
+
+    private BookingHotelDetail createBookingHotelDetails(BookingRequest bookingRequest, UUID bookingId, SaveRepository.BeginEnd beginEnd){
+        BookingHotelDetail bookingHotelDetail = new BookingHotelDetail();
+        bookingHotelDetail.getBookingHotelDetailKey().setHotel(bookingRequest.getHotel());
+        bookingHotelDetail.getBookingHotelDetailKey().setCity(bookingRequest.getCity());
+        bookingHotelDetail.getBookingHotelDetailKey().setBeginEnd(beginEnd.getName());
+        switch (beginEnd){
+            case BEGIN:{
+                bookingHotelDetail.getBookingHotelDetailKey().setEventDate(bookingRequest.getStart());
+                break;
+            }
+            case END:{
+                bookingHotelDetail.getBookingHotelDetailKey().setEventDate(bookingRequest.getEnd());
+                break;
+            }
+        }
+        bookingHotelDetail.getBookingHotelDetailKey().setRoomNumber(bookingRequest.getRoomNumber());
+        bookingHotelDetail.setBookingId(bookingId);
+        return bookingHotelDetail;
     }
 
 }
