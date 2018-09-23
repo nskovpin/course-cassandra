@@ -174,7 +174,7 @@ public class CassandraRestApi {
                HttpStatus.FOUND);
     }
 
-    //
+    //localhost:8080/api/get/freerooms?hotel=mariya&city=voronezh&startReserve=2018-07-07T11:11:11&endReserve=2018-08-24T11:11:11
     @RequestMapping(path = "/get/roombyguest", method = RequestMethod.GET)
     public ResponseEntity<?> getRoomByGuest(@RequestParam String guestName,
                                                         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate date){
