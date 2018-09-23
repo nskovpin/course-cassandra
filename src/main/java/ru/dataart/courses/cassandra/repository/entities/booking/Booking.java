@@ -14,7 +14,7 @@ public class Booking {
     @PrimaryKey
     private BookingKey bookingKey;
 
-    @Column
+    @Column("guest_id")
     private UUID guestId;
 
     @Column

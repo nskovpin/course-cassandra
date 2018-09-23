@@ -1,6 +1,7 @@
 package ru.dataart.courses.cassandra.repository.entities.booking;
 
 
+import com.datastax.driver.core.LocalDate;
 import org.springframework.data.cassandra.core.cql.Ordering;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyClass;
@@ -17,7 +18,7 @@ public class BookingDetailKey implements Serializable {
     private UUID guestId;
 
     @PrimaryKeyColumn(name = "day", ordinal = 1, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
-    private Date day;
+    private LocalDate day;
 
     public UUID getGuestId() {
         return guestId;
@@ -27,18 +28,18 @@ public class BookingDetailKey implements Serializable {
         this.guestId = guestId;
     }
 
-    public Date getDay() {
+    public LocalDate getDay() {
         return day;
     }
 
-    public void setDay(Date day) {
+    public void setDay(LocalDate day) {
         this.day = day;
     }
 
     public BookingDetailKey() {
     }
 
-    public BookingDetailKey(Date day, UUID guestId) {
+    public BookingDetailKey(LocalDate day, UUID guestId) {
         this.guestId = guestId;
         this.day = day;
     }

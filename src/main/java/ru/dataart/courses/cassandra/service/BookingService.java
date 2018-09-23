@@ -9,6 +9,7 @@ import ru.dataart.courses.cassandra.repository.entities.hotel.City;
 import ru.dataart.courses.cassandra.repository.entities.hotel.Hotel;
 import ru.dataart.courses.cassandra.repository.entities.hotel.Room;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -31,9 +32,11 @@ public interface BookingService {
 
     List<Integer> getFreeRooms(String hotelName, String city, LocalDateTime startReserveTime, LocalDateTime endReserveTime);
 
-    List<BookingDetail> getReservedRooms(UUID guestId, LocalDateTime dt);
+    List<BookingDetail> getReservedRooms(UUID guestId, LocalDate dt);
 
     List<City> findAllByCityName(String cityName);
 
     Guest findGuestByName(String name);
+
+    Room findRoom(Integer roomNumber, String hotel, String city);
 }

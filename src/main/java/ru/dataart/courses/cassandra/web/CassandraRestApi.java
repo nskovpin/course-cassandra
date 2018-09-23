@@ -1,8 +1,10 @@
 package ru.dataart.courses.cassandra.web;
 
+import com.datastax.driver.core.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,10 +24,8 @@ import javax.validation.constraints.NotNull;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.time.ZoneOffset;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static ru.dataart.courses.cassandra.repository.SaveRepository.BeginEnd.BEGIN;
@@ -46,6 +46,7 @@ public class CassandraRestApi {
         return "Test";
     }
 
+
     @RequestMapping(path = "/get/city", method = RequestMethod.GET)
     @ApiChecked
     public ResponseEntity<List<CityResponse>> getHotelsByCity(@RequestParam("name") @NotNull String name) {
@@ -55,7 +56,16 @@ public class CassandraRestApi {
                 .collect(Collectors.toList()), HttpStatus.FOUND);
     }
 
-    @RequestMapping(path = "/add/hotel", method = RequestMethod.POST)
+    /**
+     * localhost:8080/api/add/hotel
+     * {
+     "hotel": "hostel",
+     "rooms": [1,2,3],
+     "city": "voronezh",
+     "address": "moskovskiy pr"
+     }
+     */
+    @RequestMapping(path = "/add/hotel", method = RequestMethod.POST, consumes = "application/json")
     @ApiChecked
     public ResponseEntity<Hotel> addNewHotel(@RequestBody @NotNull HotelRequest hotel) {
         Objects.requireNonNull(hotel);
@@ -68,10 +78,20 @@ public class CassandraRestApi {
         return new ResponseEntity<>(hotelDb, HttpStatus.CREATED);
     }
 
-    @RequestMapping(path = "/add/room", method = RequestMethod.POST)
+    /**
+     *
+     localhost:8080/api/add/room
+     {
+     "hotel": "hostel",
+     "roomNumber": 14,
+     "city": "voronezh"
+     }
+     */
+    @RequestMapping(path = "/add/room", method = RequestMethod.POST, consumes = "application/json")
     @ApiChecked
     public ResponseEntity<Room> addNewRoom(@RequestBody @NotNull RoomRequest room) {
         Objects.requireNonNull(room);
+        Objects.requireNonNull(room.getRoomNumber());
         Room roomDb = new Room();
         roomDb.getRoomKey().setCity(room.getCity());
         roomDb.getRoomKey().setHotel(room.getHotel());
@@ -80,7 +100,13 @@ public class CassandraRestApi {
         return new ResponseEntity<>(roomDb, HttpStatus.CREATED);
     }
 
-    @RequestMapping(path = "/add/guest", method = RequestMethod.POST)
+    /**
+     * localhost:8080/api/add/guest
+     * {
+     	"name": "Nikolay S"
+     }
+     */
+    @RequestMapping(path = "/add/guest", method = RequestMethod.POST, consumes = "application/json")
     @ApiChecked
     public ResponseEntity<Guest> addNewGuest(@RequestBody @NotNull GuestRequest guest) {
         Objects.requireNonNull(guest);
@@ -90,21 +116,44 @@ public class CassandraRestApi {
         return new ResponseEntity<>(guestDb, HttpStatus.CREATED);
     }
 
-    @RequestMapping(path = "/add/booking", method = RequestMethod.POST)
-    public ResponseEntity<?> addNewGuest(@RequestBody @NotNull BookingRequest bookingRequest) {
+    /**
+     *
+     localhost:8080/api/add/booking
+     {
+     	 "guestName" : "Nikolay S",
+                  "comment" : "random comment",
+                  "start": "2018-08-23",
+                  "end": "2018-08-26",
+                  "roomNumber": 2,
+                  "hotel": "mariya",
+                  "city": "voronezh"
+     }
+     */
+    @RequestMapping(path = "/add/booking", method = RequestMethod.POST, consumes = "application/json")
+    public ResponseEntity<?> addNewBooking(@RequestBody @NotNull BookingRequest bookingRequest) {
         Objects.requireNonNull(bookingRequest);
+        Objects.requireNonNull(bookingRequest.getStart());
+        Objects.requireNonNull(bookingRequest.getEnd());
         Guest guestDb = bookingService.findGuestByName(bookingRequest.getGuestName());
+        Room room = bookingService.findRoom(bookingRequest.getRoomNumber(), bookingRequest.getHotel(), bookingRequest.getCity());
+        if(room == null){
+            return new ResponseEntity<>("Sorry, this room doesn't exist", HttpStatus.NOT_FOUND);
+        }
         if(Objects.isNull(guestDb)){
             guestDb = new Guest();
             guestDb.getGuestKey().setGuestName(bookingRequest.getGuestName());
             bookingService.saveGuest(guestDb);
+        }
+        List<Integer> rooms = bookingService.getFreeRooms(bookingRequest.getHotel(), bookingRequest.getCity(),
+                bookingRequest.getStart().toLocalDateTime(), bookingRequest.getEnd().toLocalDateTime());
+        if(!rooms.contains(bookingRequest.getRoomNumber())){
+            return new ResponseEntity<>("Sorry, this room is booked", HttpStatus.NOT_FOUND);
         }
         Booking bookingDb = new Booking();
         bookingDb.setGuestId(guestDb.getGuestKey().getId());
         bookingDb.setComment(bookingRequest.getComment());
         bookingService.saveBooking(bookingDb);
         //loop
-        //TODO
         List<BookingDetail> bookingsByDays = splitByDays(bookingRequest, guestDb.getGuestKey().getId(), bookingDb.getBookingKey().getId());
         bookingsByDays.forEach(x -> bookingService.saveBookingDetails(x));
 
@@ -112,28 +161,38 @@ public class CassandraRestApi {
         BookingHotelDetail endEntity = createBookingHotelDetails(bookingRequest, bookingDb.getBookingKey().getId(), SaveRepository.BeginEnd.END);
         bookingService.saveBookingHotelDetails(startEntity);
         bookingService.saveBookingHotelDetails(endEntity);
-
-
-        bookingService.saveGuest(guestDb);
         return new ResponseEntity<>(bookingDb, HttpStatus.CREATED);
     }
 
+    //localhost:8080/api/get/freerooms?hotel=mariya&city=voronezh&startReserve=2018-07-07T11:11:11&endReserve=2018-08-23T11:11:11
     @RequestMapping(path = "/get/freerooms", method = RequestMethod.GET)
     public ResponseEntity<List<Integer>> getHotelFreeRooms(@RequestParam @NotNull String hotel,
                                                @RequestParam @NotNull String city,
-                                               @RequestParam @NotNull LocalDateTime startReverse,
-                                               @RequestParam @NotNull LocalDateTime endReverse) {
-       return new ResponseEntity<>(bookingService.getFreeRooms(hotel, city, startReverse, endReverse),
+                                               @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @NotNull LocalDateTime startReserve,
+                                               @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @NotNull LocalDateTime endReserve) {
+       return new ResponseEntity<>(bookingService.getFreeRooms(hotel, city, startReserve, endReserve),
                HttpStatus.FOUND);
     }
 
+    //
     @RequestMapping(path = "/get/roombyguest", method = RequestMethod.GET)
-    public ResponseEntity<List<BookedResponse>> getRoomByGuest(@RequestParam String userId,
-                                                        @RequestParam LocalDateTime date){
-        UUID id = UUID.fromString(userId);
-        return new ResponseEntity<>(bookingService.getReservedRooms(id, date)
+    public ResponseEntity<?> getRoomByGuest(@RequestParam String guestName,
+                                                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate date){
+        Guest guest = bookingService.findGuestByName(guestName);
+        if(guest == null){
+            return new ResponseEntity<>("We don't know this user", HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(bookingService.getReservedRooms(guest.getGuestKey().getId(), date)
                 .stream()
-                .map(x -> new BookedResponse())
+                .map(x -> {
+                    BookedResponse resp = new BookedResponse();
+                    resp.setCity(x.getCity());
+                    resp.setHotel(x.getHotel());
+                    resp.setRoomNumber(x.getRoomNumber());
+                    resp.setStart(LocalDateTime.ofInstant(x.getStart().toInstant(), ZoneOffset.UTC).toLocalDate());
+                    resp.setEnd(LocalDateTime.ofInstant(x.getEnd().toInstant(), ZoneOffset.UTC).toLocalDate());
+                    return resp;
+                })
                 .collect(Collectors.toList()), HttpStatus.FOUND);
     }
 
@@ -142,9 +201,11 @@ public class CassandraRestApi {
         LocalDateTime end = bookingRequest.getEnd().toLocalDateTime();
         List<BookingDetail> days = new ArrayList<>();
         while (start.isBefore(end)){
-            LocalDateTime day = start.plusDays(1);
+            LocalDateTime day = start;
             BookingDetail bookingDetail = new BookingDetail();
-            bookingDetail.setBookingDetailKey(new BookingDetailKey(Date.valueOf(day.toLocalDate()), guestId));
+            bookingDetail.setBookingDetailKey(new BookingDetailKey(LocalDate.fromYearMonthDay(day.toLocalDate().getYear(),
+                    day.toLocalDate().getMonth().getValue(),
+                    day.toLocalDate().getDayOfMonth()), guestId));
             bookingDetail.setBookingId(bookingId);
             bookingDetail.setCity(bookingRequest.getCity());
             bookingDetail.setStart(bookingRequest.getStart());
@@ -152,7 +213,7 @@ public class CassandraRestApi {
             bookingDetail.setHotel(bookingRequest.getHotel());
             bookingDetail.setRoomNumber(bookingRequest.getRoomNumber());
             days.add(bookingDetail);
-            start = day;
+            start = day.plusDays(1);
         }
         return days;
     }

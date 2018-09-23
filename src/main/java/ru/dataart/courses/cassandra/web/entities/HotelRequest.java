@@ -6,13 +6,10 @@ import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 public class HotelRequest {
-    @NotNull
     private String hotel;
-    @NotNull
     private Set<Integer> rooms;
     @NotNull
     private String address;
-    @NotNull
     private String city;
 
     public String getHotel() {

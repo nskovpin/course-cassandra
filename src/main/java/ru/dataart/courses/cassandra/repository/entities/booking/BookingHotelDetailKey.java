@@ -1,5 +1,6 @@
 package ru.dataart.courses.cassandra.repository.entities.booking;
 
+import com.datastax.driver.core.LocalDate;
 import org.springframework.data.cassandra.core.cql.Ordering;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyClass;
@@ -7,6 +8,7 @@ import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 
 @PrimaryKeyClass
@@ -19,7 +21,7 @@ public class BookingHotelDetailKey implements Serializable {
     private String city;
 
     @PrimaryKeyColumn(name = "event_date", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
-    private Timestamp eventDate;
+    private Date eventDate;
 
     @PrimaryKeyColumn(name = "begin_end", ordinal = 3, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
     private String beginEnd;
@@ -43,11 +45,11 @@ public class BookingHotelDetailKey implements Serializable {
         this.city = city;
     }
 
-    public Timestamp getEventDate() {
+    public Date getEventDate() {
         return eventDate;
     }
 
-    public void setEventDate(Timestamp eventDate) {
+    public void setEventDate(Date eventDate) {
         this.eventDate = eventDate;
     }
 

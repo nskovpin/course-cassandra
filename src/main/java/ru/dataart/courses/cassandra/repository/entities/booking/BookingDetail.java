@@ -6,6 +6,7 @@ import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.UUID;
 
 @Table("booking_detail")
@@ -17,11 +18,11 @@ public class BookingDetail {
     @Column("booking_id")
     private UUID bookingId;
 
-    @Column("event_start")
-    private Timestamp start;
+    @Column("start")
+    private Date start;
 
-    @Column("event_end")
-    private Timestamp end;
+    @Column("end")
+    private Date end;
 
     @Column("room_number")
     private Integer roomNumber;
@@ -48,19 +49,19 @@ public class BookingDetail {
         this.bookingId = bookingId;
     }
 
-    public Timestamp getStart() {
+    public Date getStart() {
         return start;
     }
 
-    public void setStart(Timestamp start) {
+    public void setStart(Date start) {
         this.start = start;
     }
 
-    public Timestamp getEnd() {
+    public Date getEnd() {
         return end;
     }
 
-    public void setEnd(Timestamp end) {
+    public void setEnd(Date end) {
         this.end = end;
     }
 

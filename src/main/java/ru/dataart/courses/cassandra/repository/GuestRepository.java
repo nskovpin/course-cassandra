@@ -7,6 +7,7 @@ import ru.dataart.courses.cassandra.repository.entities.guest.Guest;
 import ru.dataart.courses.cassandra.repository.entities.guest.GuestKey;
 
 @RepositoryProfile
+@Repository
 public interface GuestRepository extends CassandraRepository<Guest, GuestKey> {
 
     @Query("select * from guest where guest_name=?0")

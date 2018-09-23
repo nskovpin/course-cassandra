@@ -15,6 +15,7 @@ import ru.dataart.courses.cassandra.repository.entities.hotel.City;
 import ru.dataart.courses.cassandra.repository.entities.hotel.Hotel;
 import ru.dataart.courses.cassandra.repository.entities.hotel.Room;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -32,6 +33,18 @@ public class SaveRepository {
         city.getCityKey().setCityName(hotel.getHotelKey().getCityName());
         city.getCityKey().setHotelName(hotel.getHotelKey().getHotelName());
         cassandraOperations.insert(city);
+        hotel.getRooms().stream().map(x-> {
+            Room roomDb = new Room();
+            roomDb.getRoomKey().setCity(hotel.getHotelKey().getCityName());
+            roomDb.getRoomKey().setHotel(hotel.getHotelKey().getHotelName());
+            roomDb.getRoomKey().setRoomNumber(x);
+            return roomDb;
+        }).forEach(x -> cassandraOperations.insert(x));
+    }
+
+    public void updateHotel(Hotel hotel, Integer room) {
+        hotel.getRooms().add(room);
+        cassandraOperations.update(hotel);
     }
 
     public void saveCity(City city) {
@@ -40,6 +53,13 @@ public class SaveRepository {
         hotel.getHotelKey().setHotelName(city.getCityKey().getHotelName());
         hotel.getHotelKey().setCityName(city.getCityKey().getCityName());
         cassandraOperations.insert(hotel);
+    }
+
+    public void selectTest(){
+        Object c =  cassandraOperations.select("select * from booking_hotel_detail", Map.class);
+
+        Object c2 =  cassandraOperations.select("select * from booking_hotel_detail", BookingHotelDetail.class);
+        System.out.println(c);
     }
 
     //Explanation: Adds a new guest, who is going to book a room.
@@ -58,8 +78,11 @@ public class SaveRepository {
             hotel.getHotelKey().setHotelName(room.getRoomKey().getHotel());
             hotel.getRooms().add(room.getRoomKey().getRoomNumber());
             saveHotel(hotel);
+        } else{
+            updateHotel(hotel, room.getRoomKey().getRoomNumber());
+            cassandraOperations.insert(room);
         }
-        cassandraOperations.insert(room);
+
     }
 
     //Explanation: Adds a new room booking for a guest.

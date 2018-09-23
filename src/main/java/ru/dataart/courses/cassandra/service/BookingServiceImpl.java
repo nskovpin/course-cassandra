@@ -15,6 +15,7 @@ import ru.dataart.courses.cassandra.repository.*;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -30,16 +31,22 @@ public class BookingServiceImpl implements BookingService {
     private HotelRepository hotelRepository;
     private CityRepository cityRepository;
     private GuestRepository guestRepository;
+    private RoomRepository roomRepository;
 
     public BookingServiceImpl(@Autowired BookingDetailRepository bookingDetailRepository,
                               @Autowired BookingHotelDetailRepository bookingHotelDetailRepository,
                               @Autowired SaveRepository saveRepository,
                               @Autowired HotelRepository hotelRepository,
-                              @Autowired GuestRepository guestRepository) {
+                              @Autowired CityRepository cityRepository,
+                              @Autowired GuestRepository guestRepository,
+                              @Autowired RoomRepository roomRepository) {
         this.bookingDetailRepository = bookingDetailRepository;
         this.bookingHotelDetailRepository = bookingHotelDetailRepository;
         this.saveRepository = saveRepository;
         this.hotelRepository = hotelRepository;
+        this.cityRepository = cityRepository;
+        this.guestRepository = guestRepository;
+        this.roomRepository = roomRepository;
     }
 
     @Override
@@ -138,8 +145,10 @@ public class BookingServiceImpl implements BookingService {
     public List<Integer> getFreeRooms(String hotelName, String city, LocalDateTime startReserveTime, LocalDateTime endReserveTime) {
         try {
             Hotel hotel = hotelRepository.findHotelByCityAndName(hotelName, city);
-            List<Integer> details = bookingHotelDetailRepository.findBookedRooms(city, hotelName, Timestamp.valueOf(startReserveTime), Timestamp.valueOf(endReserveTime))
-                    .map(BookingDetail::getRoomNumber).collect(Collectors.toList());
+            List<BookingHotelDetail> select = bookingHotelDetailRepository.findBookedRooms(city, hotelName, Timestamp.valueOf(startReserveTime), Timestamp.valueOf(endReserveTime));
+            List<Integer> details = select
+                    .stream()
+                    .map(x -> x.getBookingHotelDetailKey().getRoomNumber()).collect(Collectors.toList());
             logger.info("BookingDetails has been successfully queried");
             return hotel.getRooms().stream().filter(roomNumber -> !details.contains(roomNumber)).collect(Collectors.toList());
         } catch (Exception e) {
@@ -150,8 +159,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDetail> getReservedRooms(UUID guestId, LocalDateTime dt) {
-        return bookingDetailRepository.findAllByGuestAndDate(guestId, Date.valueOf(dt.toLocalDate())).collect(Collectors.toList());
+    public List<BookingDetail> getReservedRooms(UUID guestId, LocalDate dt) {
+        return bookingDetailRepository.findAllByGuestAndDate(guestId, dt).collect(Collectors.toList());
     }
 
     @Override
@@ -161,6 +170,11 @@ public class BookingServiceImpl implements BookingService {
 
     public Guest findGuestByName(String name){
         return guestRepository.findOneByGuestName(name);
+    }
+
+    @Override
+    public Room findRoom(Integer roomNumber, String hotel, String city) {
+        return roomRepository.findOneByGuestName(roomNumber, hotel, city);
     }
 
 }
