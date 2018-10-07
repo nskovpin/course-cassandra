@@ -10,6 +10,7 @@ import ru.dataart.courses.cassandra.repository.entities.booking.BookingHotelDeta
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 @RepositoryProfile
@@ -17,8 +18,8 @@ import java.util.stream.Stream;
 public interface BookingHotelDetailRepository extends CassandraRepository<BookingHotelDetail, BookingHotelDetailKey> {
 
     //Explanation: Gets free rooms in a specific hotel for the current period.
-    @Query("select * from booking_hotel_detail where city = :city and hotel = :hotel and event_date >= :start and event_date <= :end")
-    List<BookingHotelDetail> findBookedRooms(@Param("city") String city, @Param("hotel") String hotel, @Param("start") Timestamp start, @Param("end") Timestamp end);
+    @Query("select * from booking_hotel_detail where hotel_id = :hotel_id and event_date >= :start and event_date <= :end")
+    List<BookingHotelDetail> findBookedRooms(@Param("hotel_id") UUID hotelId, @Param("start") Timestamp start, @Param("end") Timestamp end);
 
     @Query("select * from booking_hotel_detail")
     List<BookingHotelDetail> findAll();

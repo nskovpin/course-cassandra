@@ -13,12 +13,19 @@ import org.springframework.data.cassandra.config.CassandraEntityClassScanner;
 import org.springframework.data.cassandra.config.CassandraSessionFactoryBean;
 import org.springframework.data.cassandra.config.SchemaAction;
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Configuration
 @EnableWebMvc
 @EnableCassandraRepositories("ru.dataart.courses.cassandra.repository")
 @Profile(value = {"integration", "production"})
+@EnableAsync
 public class ApplicationConfig extends AbstractCassandraConfiguration {
 
     @Value("${cassandra.address}")
@@ -35,6 +42,17 @@ public class ApplicationConfig extends AbstractCassandraConfiguration {
     @Bean
     public Session getCassandraSession(){
         return getCassandraCluster().connect(keyspace);
+    }
+
+    @Bean
+    public Executor getExecutorService(){
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(5);
+        executor.setQueueCapacity(500);
+        executor.setThreadNamePrefix("BookingApi-");
+        executor.initialize();
+        return executor;
     }
 
 

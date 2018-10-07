@@ -12,9 +12,6 @@ public class BookingHotelDetail {
     @PrimaryKey
     private BookingHotelDetailKey bookingHotelDetailKey;
 
-    @Column("booking_id")
-    private UUID bookingId;
-
     public BookingHotelDetail() {
         this.bookingHotelDetailKey = new BookingHotelDetailKey();
     }
@@ -25,13 +22,5 @@ public class BookingHotelDetail {
 
     public void setBookingHotelDetailKey(BookingHotelDetailKey bookingHotelDetailKey) {
         this.bookingHotelDetailKey = bookingHotelDetailKey;
-    }
-
-    public UUID getBookingId() {
-        return bookingId;
-    }
-
-    public void setBookingId(UUID bookingId) {
-        this.bookingId = bookingId;
     }
 }

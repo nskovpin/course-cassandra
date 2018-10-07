@@ -3,23 +3,23 @@ package ru.dataart.courses.cassandra.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import ru.dataart.courses.cassandra.repository.entities.booking.Booking;
 import ru.dataart.courses.cassandra.repository.entities.booking.BookingDetail;
 import ru.dataart.courses.cassandra.repository.entities.booking.BookingHotelDetail;
 import ru.dataart.courses.cassandra.repository.entities.guest.Guest;
-import ru.dataart.courses.cassandra.repository.entities.hotel.City;
 import ru.dataart.courses.cassandra.repository.entities.hotel.Hotel;
 import ru.dataart.courses.cassandra.repository.entities.hotel.Room;
 import ru.dataart.courses.cassandra.repository.*;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,7 +29,6 @@ public class BookingServiceImpl implements BookingService {
     private BookingHotelDetailRepository bookingHotelDetailRepository;
     private SaveRepository saveRepository;
     private HotelRepository hotelRepository;
-    private CityRepository cityRepository;
     private GuestRepository guestRepository;
     private RoomRepository roomRepository;
 
@@ -37,107 +36,84 @@ public class BookingServiceImpl implements BookingService {
                               @Autowired BookingHotelDetailRepository bookingHotelDetailRepository,
                               @Autowired SaveRepository saveRepository,
                               @Autowired HotelRepository hotelRepository,
-                              @Autowired CityRepository cityRepository,
                               @Autowired GuestRepository guestRepository,
                               @Autowired RoomRepository roomRepository) {
         this.bookingDetailRepository = bookingDetailRepository;
         this.bookingHotelDetailRepository = bookingHotelDetailRepository;
         this.saveRepository = saveRepository;
         this.hotelRepository = hotelRepository;
-        this.cityRepository = cityRepository;
         this.guestRepository = guestRepository;
         this.roomRepository = roomRepository;
     }
 
+    @Async
     @Override
-    public boolean saveHotel(Hotel hotel) {
+    public CompletableFuture<Boolean> saveHotel(Hotel hotel) {
         try {
             saveRepository.saveHotel(hotel);
             logger.info("{} has been successfully saved", hotel.getHotelKey());
         } catch (Exception e) {
             logger.error("{} hasn't been saved", hotel.getHotelKey());
             logger.error(e.getMessage());
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
+    @Async
     @Override
-    public boolean saveCity(City city) {
+    public CompletableFuture<Boolean> saveRoom(Room room, Hotel hotel) {
         try {
-            saveRepository.saveCity(city);
-            logger.info("{} has been successfully saved", city.getCityKey());
-        } catch (Exception e) {
-            logger.error("{} hasn't been saved", city.getCityKey());
-            logger.error(e.getMessage());
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean saveRoom(Room room) {
-        try {
-            saveRepository.saveRoom(room);
+            saveRepository.saveRoom(room, hotel);
             logger.info("{} has been successfully saved", room.getRoomKey());
         } catch (Exception e) {
             logger.error("{} hasn't been saved", room.getRoomKey());
             logger.error(e.getMessage());
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
+    @Async
     @Override
-    public boolean saveGuest(Guest guest) {
+    public CompletableFuture<Boolean> saveGuest(Guest guest) {
         try {
             saveRepository.saveGuest(guest);
             logger.info("{} has been successfully saved", guest.getGuestKey());
         } catch (Exception e) {
             logger.error("{} hasn't been saved", guest.getGuestKey());
             logger.error(e.getMessage());
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
+    @Async
     @Override
-    public boolean saveBooking(Booking booking) {
-        try {
-            saveRepository.saveBooking(booking);
-            logger.info("{} has been successfully saved", booking.getBookingKey());
-        } catch (Exception e) {
-            logger.error("{} hasn't been saved", booking.getBookingKey());
-            logger.error(e.getMessage());
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean saveBookingDetails(BookingDetail bookingDetail) {
+    public CompletableFuture<Boolean> saveBookingDetails(BookingDetail bookingDetail) {
         try {
             saveRepository.saveBookingDetail(bookingDetail);
             logger.info("{} has been successfully saved", bookingDetail.getBookingDetailKey());
         } catch (Exception e) {
             logger.error("{} hasn't been saved", bookingDetail.getBookingDetailKey());
             logger.error(e.getMessage());
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
+    @Async
     @Override
-    public boolean saveBookingHotelDetails(BookingHotelDetail bookingHotelDetail) {
+    public CompletableFuture<Boolean> saveBookingHotelDetails(BookingHotelDetail bookingHotelDetail) {
         try {
             saveRepository.saveBookingHotelDetail(bookingHotelDetail);
             logger.info("{} has been successfully saved", bookingHotelDetail.getBookingHotelDetailKey());
         } catch (Exception e) {
             logger.error("{} hasn't been saved", bookingHotelDetail.getBookingHotelDetailKey());
             logger.error(e.getMessage());
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
 
@@ -145,7 +121,10 @@ public class BookingServiceImpl implements BookingService {
     public List<Integer> getFreeRooms(String hotelName, String city, LocalDateTime startReserveTime, LocalDateTime endReserveTime) {
         try {
             Hotel hotel = hotelRepository.findHotelByCityAndName(hotelName, city);
-            List<BookingHotelDetail> select = bookingHotelDetailRepository.findBookedRooms(city, hotelName, Timestamp.valueOf(startReserveTime), Timestamp.valueOf(endReserveTime));
+            if(Objects.isNull(hotel)){
+                throw new RuntimeException("Sorry, but this hotel doesn't exist");
+            }
+            List<BookingHotelDetail> select = bookingHotelDetailRepository.findBookedRooms(hotel.getId(), Timestamp.valueOf(startReserveTime), Timestamp.valueOf(endReserveTime));
             List<Integer> details = select
                     .stream()
                     .map(x -> x.getBookingHotelDetailKey().getRoomNumber()).collect(Collectors.toList());
@@ -164,8 +143,21 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<City> findAllByCityName(String cityName) {
-        return cityRepository.findAllByCityName(cityName);
+    public List<Hotel> findAllByCityName(String cityName) {
+        return hotelRepository.findHotelsByCity(cityName);
+    }
+
+    @Async
+    @Override
+    public CompletableFuture<List<Hotel>> findAllByCityNameComputable(String cityName) {
+        logger.info("Finding hotels by city");
+        return CompletableFuture.completedFuture(hotelRepository.findHotelsByCity(cityName));
+    }
+
+    @Override
+    public Hotel findByCityAndHotel(String cityName, String hotelName) {
+        logger.info("Finding hotel by city and name");
+        return  hotelRepository.findHotelByCityAndName(hotelName, cityName);
     }
 
     public Guest findGuestByName(String name){
@@ -173,8 +165,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Room findRoom(Integer roomNumber, String hotel, String city) {
-        return roomRepository.findOneByGuestName(roomNumber, hotel, city);
+    public Room findRoom(Integer roomNumber, UUID hotelId) {
+        return roomRepository.findOneByRoomAndHotel(roomNumber, hotelId);
     }
 
 }

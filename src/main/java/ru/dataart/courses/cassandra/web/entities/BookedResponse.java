@@ -3,29 +3,21 @@ package ru.dataart.courses.cassandra.web.entities;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.UUID;
 
 public class BookedResponse {
 
-    private String hotel;
-    private String city;
+    private UUID hotelId;
     private Integer roomNumber;
     private LocalDate start;
     private LocalDate end;
 
-    public String getHotel() {
-        return hotel;
+    public UUID getHotelId() {
+        return hotelId;
     }
 
-    public void setHotel(String hotel) {
-        this.hotel = hotel;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
+    public void setHotelId(UUID hotelId) {
+        this.hotelId = hotelId;
     }
 
     public Integer getRoomNumber() {

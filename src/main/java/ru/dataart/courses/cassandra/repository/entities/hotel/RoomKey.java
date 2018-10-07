@@ -5,6 +5,7 @@ import org.springframework.data.cassandra.core.mapping.PrimaryKeyClass;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 @PrimaryKeyClass
 public class RoomKey implements Serializable {
@@ -12,11 +13,8 @@ public class RoomKey implements Serializable {
     @PrimaryKeyColumn(name = "room_number", type = PrimaryKeyType.PARTITIONED, ordinal = 0)
     private Integer roomNumber;
 
-    @PrimaryKeyColumn(name = "hotel", type = PrimaryKeyType.PARTITIONED, ordinal = 1)
-    private String hotel;
-
-    @PrimaryKeyColumn(name = "city", type = PrimaryKeyType.CLUSTERED, ordinal = 1)
-    private String city;
+    @PrimaryKeyColumn(name = "hotel_id", type = PrimaryKeyType.CLUSTERED, ordinal = 1)
+    private UUID hotelId;
 
     public Integer getRoomNumber() {
         return roomNumber;
@@ -26,28 +24,11 @@ public class RoomKey implements Serializable {
         this.roomNumber = roomNumber;
     }
 
-    public String getHotel() {
-        return hotel;
+    public UUID getHotelId() {
+        return hotelId;
     }
 
-    public void setHotel(String hotel) {
-        this.hotel = hotel;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    @Override
-    public String   toString() {
-        return "RoomKey{" +
-                "roomNumber=" + roomNumber +
-                ", hotel='" + hotel + '\'' +
-                ", city='" + city + '\'' +
-                '}';
+    public void setHotelId(UUID hotelId) {
+        this.hotelId = hotelId;
     }
 }

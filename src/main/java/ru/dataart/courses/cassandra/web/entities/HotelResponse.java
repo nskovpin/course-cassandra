@@ -1,12 +1,12 @@
 package ru.dataart.courses.cassandra.web.entities;
 
-public class CityResponse {
+public class HotelResponse {
 
     private String city;
 
     private String hotel;
 
-    public CityResponse(String city, String hotel) {
+    public HotelResponse(String city, String hotel) {
         this.city = city;
         this.hotel = hotel;
     }

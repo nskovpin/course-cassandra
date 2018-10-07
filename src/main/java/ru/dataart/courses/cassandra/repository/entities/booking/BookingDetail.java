@@ -15,9 +15,6 @@ public class BookingDetail {
     @PrimaryKey
     private BookingDetailKey bookingDetailKey;
 
-    @Column("booking_id")
-    private UUID bookingId;
-
     @Column("start")
     private Date start;
 
@@ -27,11 +24,8 @@ public class BookingDetail {
     @Column("room_number")
     private Integer roomNumber;
 
-    @Column("hotel")
-    private String hotel;
-
-    @Column("city")
-    private String city;
+    @Column("hotel_id")
+    private UUID hotelId;
 
     public BookingDetailKey getBookingDetailKey() {
         return bookingDetailKey;
@@ -39,14 +33,6 @@ public class BookingDetail {
 
     public void setBookingDetailKey(BookingDetailKey bookingDetailKey) {
         this.bookingDetailKey = bookingDetailKey;
-    }
-
-    public UUID getBookingId() {
-        return bookingId;
-    }
-
-    public void setBookingId(UUID bookingId) {
-        this.bookingId = bookingId;
     }
 
     public Date getStart() {
@@ -73,19 +59,11 @@ public class BookingDetail {
         this.roomNumber = roomNumber;
     }
 
-    public String getHotel() {
-        return hotel;
+    public UUID getHotelId() {
+        return hotelId;
     }
 
-    public void setHotel(String hotel) {
-        this.hotel = hotel;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
+    public void setHotelId(UUID hotelId) {
+        this.hotelId = hotelId;
     }
 }

@@ -16,7 +16,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.dataart.courses.cassandra.config.ApplicationConfig;
 import ru.dataart.courses.cassandra.repository.entities.guest.Guest;
-import ru.dataart.courses.cassandra.repository.entities.hotel.City;
 import ru.dataart.courses.cassandra.repository.entities.hotel.Hotel;
 import ru.dataart.courses.cassandra.repository.entities.hotel.Room;
 import ru.dataart.courses.cassandra.service.BookingService;
@@ -26,6 +25,7 @@ import ru.dataart.courses.cassandra.web.entities.HotelRequest;
 import ru.dataart.courses.cassandra.web.entities.RoomRequest;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -54,32 +54,29 @@ public class BookingWebTest {
 
     @Before
     public void setup() {
-        List<City> cities = new ArrayList<>();
-        City city = new City();
-        city.getCityKey().setCityName("Moscow");
-        city.getCityKey().setHotelName("Hotel N1");
-        cities.add(city);
-        Mockito.when(bookingService.findAllByCityName("Moscow")).thenReturn(cities);
+        List<Hotel> hotels = new ArrayList<>();
+        Hotel hotel = new Hotel();
+        hotel.getHotelKey().setHotel("Hotel N1");
+        hotel.getHotelKey().setCity("Moscow");
+        hotels.add(hotel);
+        Mockito.when(bookingService.findAllByCityName("Moscow")).thenReturn(hotels);
         Mockito.when(bookingService.findAllByCityName("NotExistingCity")).thenReturn(Collections.emptyList());
-        Mockito.when(bookingService.saveHotel(any(Hotel.class))).thenReturn(Boolean.TRUE);
-        Mockito.when(bookingService.saveRoom(any(Room.class))).thenReturn(Boolean.TRUE);
-        Mockito.when(bookingService.saveGuest(any(Guest.class))).thenReturn(Boolean.TRUE);
+        Mockito.when(bookingService.saveHotel(any(Hotel.class))).thenReturn(CompletableFuture.completedFuture(Boolean.TRUE));
+        Mockito.when(bookingService.saveRoom(any(Room.class), any(Hotel.class))).thenReturn(CompletableFuture.completedFuture(Boolean.TRUE));
+        Mockito.when(bookingService.saveGuest(any(Guest.class))).thenReturn(CompletableFuture.completedFuture(Boolean.TRUE));
     }
 
     @Test
     public void getCityEndpointTest() throws Exception {
         mvc.perform(get(String.format("/api/get/city?name=%s", "Moscow"))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isFound())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].city", is("Moscow")));
+                .andExpect(status().isOk());
         Mockito.verify(bookingService).findAllByCityName("Moscow");
         Mockito.verifyNoMoreInteractions(bookingService);
 
         mvc.perform(get(String.format("/api/get/city?name=%s", "NotExistingCity"))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isFound())
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(status().isOk());
         Mockito.verify(bookingService).findAllByCityName("NotExistingCity");
         Mockito.verifyNoMoreInteractions(bookingService);
     }
@@ -114,7 +111,7 @@ public class BookingWebTest {
                 .content(mapper.writeValueAsString(roomRequest))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("roomKey.hotel", is("BRNO")));
+                .andExpect(jsonPath("roomKey.roomNumber", is(33)));
     }
 
     @Test
@@ -124,19 +121,6 @@ public class BookingWebTest {
 
         mvc.perform(post("/api/add/guest")
                 .content(mapper.writeValueAsString(guestRequest))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("guestKey.guestName", is("Nikolay")));
-    }
-
-    @Test
-    public void addBookingTest() throws Exception {
-        BookingRequest bookingRequest = new BookingRequest();
-        bookingRequest.setComment("This is comment");
-        bookingRequest.setGuestName("Nikolay");
-
-        mvc.perform(post("/api/add/guest")
-                .content(mapper.writeValueAsString(null))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("guestKey.guestName", is("Nikolay")));

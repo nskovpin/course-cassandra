@@ -10,40 +10,22 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Objects;
+import java.util.UUID;
 
 @PrimaryKeyClass
 public class BookingHotelDetailKey implements Serializable {
 
-    @PrimaryKeyColumn(name = "hotel", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
-    private String hotel;
+    @PrimaryKeyColumn(name = "hotel_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
+    private UUID hotelId;
 
-    @PrimaryKeyColumn(name = "city", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
-    private String city;
-
-    @PrimaryKeyColumn(name = "event_date", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
+    @PrimaryKeyColumn(name = "event_date", ordinal = 1, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
     private Date eventDate;
 
-    @PrimaryKeyColumn(name = "begin_end", ordinal = 3, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
+    @PrimaryKeyColumn(name = "begin_end", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
     private String beginEnd;
 
-    @PrimaryKeyColumn(name = "room_number", ordinal = 4, type = PrimaryKeyType.CLUSTERED)
+    @PrimaryKeyColumn(name = "room_number", ordinal = 3, type = PrimaryKeyType.CLUSTERED)
     private Integer roomNumber;
-
-    public String getHotel() {
-        return hotel;
-    }
-
-    public void setHotel(String hotel) {
-        this.hotel = hotel;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
 
     public Date getEventDate() {
         return eventDate;
@@ -69,20 +51,33 @@ public class BookingHotelDetailKey implements Serializable {
         this.roomNumber = roomNumber;
     }
 
+    public UUID getHotelId() {
+        return hotelId;
+    }
+
+    public void setHotelId(UUID hotelId) {
+        this.hotelId = hotelId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         BookingHotelDetailKey that = (BookingHotelDetailKey) o;
-        return Objects.equals(hotel, that.hotel) &&
-                Objects.equals(city, that.city) &&
-                Objects.equals(eventDate, that.eventDate) &&
-                Objects.equals(beginEnd, that.beginEnd) &&
-                Objects.equals(roomNumber, that.roomNumber);
+
+        if (hotelId != null ? !hotelId.equals(that.hotelId) : that.hotelId != null) return false;
+        if (eventDate != null ? !eventDate.equals(that.eventDate) : that.eventDate != null) return false;
+        if (beginEnd != null ? !beginEnd.equals(that.beginEnd) : that.beginEnd != null) return false;
+        return roomNumber != null ? roomNumber.equals(that.roomNumber) : that.roomNumber == null;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(hotel, city, eventDate, beginEnd, roomNumber);
+        int result = hotelId != null ? hotelId.hashCode() : 0;
+        result = 31 * result + (eventDate != null ? eventDate.hashCode() : 0);
+        result = 31 * result + (beginEnd != null ? beginEnd.hashCode() : 0);
+        result = 31 * result + (roomNumber != null ? roomNumber.hashCode() : 0);
+        return result;
     }
 }

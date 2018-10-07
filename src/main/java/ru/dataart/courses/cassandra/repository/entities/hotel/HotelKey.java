@@ -11,26 +11,26 @@ import java.util.Objects;
 @PrimaryKeyClass
 public class HotelKey implements Serializable {
 
-    @PrimaryKeyColumn(name = "hotel_name", type = PrimaryKeyType.PARTITIONED, ordinal = 0)
-    private String hotelName;
+    @PrimaryKeyColumn(name = "hotel", type = PrimaryKeyType.PARTITIONED, ordinal = 0)
+    private String hotel;
 
-    @PrimaryKeyColumn(name = "city_name", type = PrimaryKeyType.CLUSTERED, ordinal = 1)
-    private String cityName;
+    @PrimaryKeyColumn(name = "city", type = PrimaryKeyType.CLUSTERED, ordinal = 1)
+    private String city;
 
-    public String getHotelName() {
-        return hotelName;
+    public String getHotel() {
+        return hotel;
     }
 
-    public void setHotelName(String hotelName) {
-        this.hotelName = hotelName;
+    public void setHotel(String hotel) {
+        this.hotel = hotel;
     }
 
-    public String getCityName() {
-        return cityName;
+    public String getCity() {
+        return city;
     }
 
-    public void setCityName(String cityName) {
-        this.cityName = cityName;
+    public void setCity(String city) {
+        this.city = city;
     }
 
 
@@ -39,12 +39,12 @@ public class HotelKey implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         HotelKey hotelKey = (HotelKey) o;
-        return Objects.equals(hotelName, hotelKey.hotelName) &&
-                Objects.equals(cityName, hotelKey.cityName);
+        return Objects.equals(hotel, hotelKey.hotel) &&
+                Objects.equals(city, hotelKey.city);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(hotelName, cityName);
+        return Objects.hash(hotel, city);
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Table(value = "hotel")
 public class Hotel {
@@ -14,18 +15,30 @@ public class Hotel {
     private HotelKey hotelKey;
 
     @Column
+    private UUID id;
+
+    @Column
     private Set<Integer> rooms;
 
     @Column
     private String address;
 
     public Hotel() {
+        this.id = UUID.randomUUID();
         this.hotelKey = new HotelKey();
         this.rooms = new HashSet<>();
     }
 
     public HotelKey getHotelKey() {
         return hotelKey;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public void setHotelKey(HotelKey hotelKey) {
